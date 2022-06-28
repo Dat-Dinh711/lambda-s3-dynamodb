@@ -1,0 +1,10 @@
+# package directories
+node_modules
+jspm_packages
+context.json
+deploy.env
+event_sources.json
+event.json
+
+# Serverless directories
+.serverless
