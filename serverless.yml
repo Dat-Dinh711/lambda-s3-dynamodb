@@ -10,12 +10,21 @@ provider:
     DYNAMODB_TABLE_NAME: ${file(config.json):DYNAMODB_NAME}
 
   iamRoleStatements:
+    # Allow functions to read/write objects in a bucket
     - Effect: 'Allow'
       Action:
+        - 's3:ListObjectsV2'
         - 's3:PutObject'
         - 's3:GetObject'
       Resource:
         - 'arn:aws:s3:::${file(config.json):S3_BUCKET_NAME}/*'
+
+    # Allow functions to put objects in a dynamodb
+    - Effect: 'Allow'
+      Action:
+        - 'dynamodb:PutItem'
+      Resource:
+        - 'arn:aws:dynamodb:${file(config.json):REGION}:${aws:accountId}:table/${file(config.json):DYNAMODB_NAME}'
 
 functions:
   putData:

@@ -3,16 +3,9 @@
 const AWS = require('aws-sdk');
 const config = require('./config.json');
 
-AWS.config.update({
-  accessKeyId: config.ACCESS_KEY,
-  secretAccessKey: config.SERCET_KEY,
-});
 const S3 = new AWS.S3();
 
-const dynamoDB = new AWS.DynamoDB.DocumentClient({
-  accessKeyId: config.ACCESS_KEY,
-  secretAccessKey: config.SERCET_KEY,
-});
+const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 const data = {
   userId: '12342',
@@ -50,21 +43,16 @@ exports.getData = async event => {
     console.log('Get Data Successfully!!!');
     console.log('S3 data:', response);
 
-    const paramsDynamodb = {
-      Item: response,
-      TableName: config.DYNAMODB_NAME,
-    };
+    dynamoDB
+      .put({
+        Item: response,
+        TableName: config.DYNAMODB_NAME,
+      })
+      .promise();
 
-    dynamoDB.put(paramsDynamodb, (err, data) => {
-      if (err) {
-        console.log('Insert Data Failed!!!');
-        console.log(err);
-      } else {
-        console.log('Insert Data Successfully!!!');
-      }
-    });
+    console.log('Insert Data Successfully!!!');
   } catch (error) {
-    console.log('Get Data Failed!!!');
+    console.log('Error!!!');
     console.log(error);
   }
 };

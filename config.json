@@ -1,7 +1,5 @@
 {
   "S3_BUCKET_NAME": "lambda-s3-lambda-dynamodb",
-  "ACCESS_KEY": "AKIAZR2BMWQJCB3FTKF7",
-  "SERCET_KEY": "0VfVIWQFeuxFnVXZ1SdecorV1JiGTHze+Z+jRxgd",
   "REGION": "ap-southeast-1",
   "DYNAMODB_NAME": "lambda-s3-lambda-db"
 }
