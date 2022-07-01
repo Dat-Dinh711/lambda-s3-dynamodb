@@ -1,0 +1,70 @@
+service: lambda-s3-lambda-dynamodb
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: dev
+  region: ${file(config.json):REGION}
+  environment:
+    DYNAMODB_TABLE_NAME: ${file(config.json):DYNAMODB_NAME}
+  iamRoleStatements:
+    # Allow functions to read/write objects in a bucket
+    - Effect: 'Allow'
+      Action:
+        - 's3:ListObjectsV2'
+        - 's3:PutObject'
+        - 's3:GetObject'
+      Resource:
+        - 'arn:aws:s3:::${file(config.json):S3_BUCKET_NAME}/*'
+
+    # Allow functions to put objects in a dynamodb
+    - Effect: 'Allow'
+      Action:
+        - 'dynamodb:PutItem'
+      Resource:
+        - 'arn:aws:dynamodb:${file(config.json):REGION}:${aws:accountId}:table/${file(config.json):DYNAMODB_NAME}'
+
+functions:
+  putData:
+    handler: handler.putData
+  getData:
+    handler: handler.getData
+    events:
+      - s3:
+          bucket: ${file(config.json):S3_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          existing: true
+
+resources:
+  Resources:
+    DynamoDB:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${file(config.json):DYNAMODB_NAME}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${file(config.json):S3_BUCKET_NAME}
+        AccessControl: Private
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - HEAD
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              MaxAge: 3000

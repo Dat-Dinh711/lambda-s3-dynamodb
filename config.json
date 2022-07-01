@@ -1,0 +1,5 @@
+{
+  "S3_BUCKET_NAME": "lambda-s3-lambda-dynamodb",
+  "REGION": "ap-southeast-1",
+  "DYNAMODB_NAME": "lambda-s3-lambda-db"
+}
